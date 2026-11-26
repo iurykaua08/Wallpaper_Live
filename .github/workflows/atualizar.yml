@@ -1,0 +1,32 @@
+name: Atualizar Estatisticas CR7
+
+on:
+  schedule:
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  atualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Baixar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Executar script de coleta
+        run: node atualizar.js
+
+      - name: Salvar alteracoes no cr7.json
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add cr7.json
+          git diff --cached --quiet || git commit -m "Atualiza estatisticas CR7"
+          git push
